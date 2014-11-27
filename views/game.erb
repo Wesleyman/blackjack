@@ -18,3 +18,8 @@ Player's cards:
   <% end %>
 </ul>
 
+<p>
+  What would you like to do?
+  <%= session[:player_name] %> has <%= calculate_total(session[:player_cards])%>
+</p>
+
