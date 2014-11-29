@@ -14,7 +14,7 @@ INITIAL_POT_AMOUNT = 500
 
 helpers do
   # Cards is [['S', '9'], ['C', 'Q']] (i.e. nested arrays)
-  # Curned into an array of values in the next line.
+  # Turned into an array of values in the next line.
   def calculate_total(cards)
     arr = cards.map{|element| element[1]}
     total = 0
@@ -124,7 +124,7 @@ get '/bet' do
   erb :bet
 end
 
-get post '/bet' do
+post '/bet' do
   # All values submitted from a form come in as strings, so call to_i so as to compare
   # -- to another integer. 
 
