@@ -1,20 +1,22 @@
 require 'rubygems'
 require 'sinatra'
+require 'pry'
+
 
 use Rack::Session::Cookie, :key => 'rack.session',
                            :path => '/',
                            :secret => 'kjhfiebfcnvbmzfalfhjfhxcbmzbvwruquhqqer' 
 
 
-BLACKJACK       = 21 
-DEALER_MIN_HIT  = 17
+BLACKJACK          = 21 
+DEALER_MIN_HIT     = 17
+INITIAL_POT_AMOUNT = 500
 
 helpers do
   # Cards is [['S', '9'], ['C', 'Q']] (i.e. nested arrays)
   # Curned into an array of values in the next line.
   def calculate_total(cards)
     arr = cards.map{|element| element[1]}
-
     total = 0
     # Iterate through array of values only. 
     arr.each do |a|
@@ -65,12 +67,16 @@ helpers do
  def winner!(msg)
   @play_again = true 
   @show_hit_or_stay_buttons = false
+  # Winner condition.
+  session[:player_pot] = session[:player_pot] + session[:player_bet]
   @success = "<strong>#{session[:player_name]} wins!</strong> #{msg}"
  end
 
   def loser!(msg)
     @play_again = true 
     @show_hit_or_stay_buttons = false
+    # Loser condition.
+     session[:player_pot] = session[:player_pot] - session[:player_bet]
     @error = "<strong>#{session[:player_name]} loses!</strong> #{msg}"
    end
 
@@ -93,7 +99,11 @@ get '/' do
   end
 end
 
-get '/new_player' do 
+# new_player route.
+get '/new_player' do
+
+# Ensures player has money at the beginning of the game.   
+session[:player_pot] = INITIAL_POT_AMOUNT
   erb :new_player
 end
 
@@ -103,9 +113,36 @@ if params[:player_name].empty?
   halt erb(:new_player)
 end 
   session[:player_name] = params[:player_name]
-  redirect '/game'
+  # When new game is initialized, player is routed to bet.
+  redirect '/bet'
 end
 
+# bet route.
+get '/bet' do
+  # clears current amount on the bet page.
+  session[:player_bet] = nil  
+  erb :bet
+end
+
+get post '/bet' do
+  # All values submitted from a form come in as strings, so call to_i so as to compare
+  # -- to another integer. 
+
+  if params[:bet_amount].nil? || params[:bet_amount].to_i == 0
+    @error = "Must make a bet."
+    halt erb(:erb)
+  # No need to call to_i on player_pot here becuase it's already.
+  # -- set as such above.   
+  elsif params[:bet_amount].to_i > session[:player_pot]
+    @error = "Bet amount should be less than what you have ($#{session[:player_pot]}) "
+    halt erb(:erb)
+  else
+    session[:player_bet] = params[:bet_amount].to_i
+    redirect '/game'
+  end
+end
+
+# game route.
 get '/game' do
   session[:turn] = session[:player_name]
 

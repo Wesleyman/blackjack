@@ -5,7 +5,7 @@
 <% if @play_again  %>
   <p>
     <strong>Play again?</strong>
-    <a href="/game" class="btn btn-primary">Yes</a>
+    <a href="/bet" class="btn btn-primary">Yes</a>
     <a href="/game_over" class="btn">No</a>
   </p>
 <% end %>
@@ -28,6 +28,9 @@
       </form>
       </p>
     <% end %>
+    <h5>
+      <%= session[:player_name] %> has $<% session[:player_pot] %> and bet $<%= session[:player_bet] %> this round.
+    </h5>
 </div>
 
 <br/>
