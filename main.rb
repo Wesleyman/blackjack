@@ -129,8 +129,8 @@ post '/bet' do
   # -- to another integer. 
 
   if params[:bet_amount].nil? || params[:bet_amount].to_i == 0
-    @error = "Must make a bet."
-    halt erb(:erb)
+    @error = "Must make a bet first."
+    halt erb(:bet)
   # No need to call to_i on player_pot here becuase it's already.
   # -- set as such above.   
   elsif params[:bet_amount].to_i > session[:player_pot]
